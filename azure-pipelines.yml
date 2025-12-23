@@ -12,7 +12,7 @@ steps:
   - task: octane-test-runner-start-task-private@1
     inputs:
       OctaneServiceConnection: 'octaneConnectionForDiscovery'
-      WorkspaceList: '14005'
+      WorkspaceList: '17001'
       Framework: 'uft'
       GitRepositoryURL: 'https://github.com/vivienknecht/UftTestsWithDataTables'
 
