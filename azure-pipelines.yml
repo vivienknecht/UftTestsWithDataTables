@@ -90,13 +90,14 @@ steps:
     displayName: Discovery
 
   - powershell: |
-     mkdir -Force "$(Build.ArtifactStagingDirectory)/last-successful"
-     echo $(Build.SourceVersion) > "$(Build.ArtifactStagingDirectory)/last-successful/last_successful_commit.txt"
+     mkdir -Force "$(Pipeline.Workspace)/last-successful"
+     echo $(Build.SourceVersion) > "$(Pipeline.Workspace)/last-successful/last_successful_commit.txt"
     displayName: "Store current commit SHA"
 
-  - publish: $(Build.ArtifactStagingDirectory)/last-successful
+  - publish: $(Pipeline.Workspace)/last-successful
     artifact: last-successful
     displayName: "Publish last successful commit SHA"
+
 
   # - powershell: |
   #     Write-Host "Current Directory:"
