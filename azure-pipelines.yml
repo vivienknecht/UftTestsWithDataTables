@@ -93,7 +93,7 @@ steps:
       echo $(Build.SourceVersion) > last_successful_commit.txt
     displayName: "Store current commit SHA"
 
-  - publish: last_successful_commit.txt
+  - publish: $(Build.SourcesDirectory)/last_successful_commit.txt
     artifact: last-successful
     displayName: "Publish last successful commit SHA"
 
