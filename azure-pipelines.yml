@@ -28,13 +28,13 @@ steps:
   - task: octane-test-runner-start-task-private@1
     inputs:
       OctaneServiceConnection: "octaneConnectionForDiscovery"
-      WorkspaceList: "18001"
+      WorkspaceList: "4001"
       Framework: "uft"
       GitRepositoryURL: "https://github.com/vivienknecht/UftTestsWithDataTables"
 
-  # - powershell: |
-  #     node dist/index.js --action="convertTests" --framework="uft" --testsToRun=${env:TESTSTORUN} --logLevel=1  
-  #   displayName: TestConversion
+  - powershell: |
+      node dist/index.js --action="convertTests" --framework="uft" --testsToRun=${env:TESTSTORUN} --logLevel=1  
+    displayName: TestConversion
 
   - checkout: self
     fetchDepth: 0
@@ -48,53 +48,56 @@ steps:
       buildVersionToDownload: "latestFromBranch"
       branchName: "$(Build.SourceBranch)"
       artifactName: "last-successful"
-      downloadPath: "$(Pipeline.Workspace)/last-successful"
+      downloadPath: "$(Pipeline.Workspace)\\last-successful"
     continueOnError: true
 
   - powershell: |
-      $artifactPath = "$(Pipeline.Workspace)/last-successful/last_successful_commit.txt"
+      ./eng/detect-changed-files.ps1
+    displayName: Detect changed files since last successful run
 
-      if (Test-Path $artifactPath) {
-        $last = Get-Content $artifactPath
-        Write-Host "Found last successful commit: $last"
-      }
-      #Necessary for first run or when no artifacts can be found
-      else {
-        $last = "$(Build.SourceVersion)^"
-        Write-Host "No previous successful run found. Using fallback commit: $last"
-      }
-      Write-Host "##vso[task.setvariable variable=LAST_SUCCESSFUL_COMMIT]$last"
-    displayName: "Resolve last successful commit"
+  # - powershell: |
+  #     $artifactPath = "$(Pipeline.Workspace)/last-successful/last_successful_commit.txt"
 
-  - task: PowerShell@2
-    name: GetFiles
-    inputs:
-      targetType: inline
-      script: |
-        git fetch --all
-        Write-Host "Diff from $Env:LAST_SUCCESSFUL_COMMIT to HEAD"
-        $files = git diff --name-status -M -z $Env:LAST_SUCCESSFUL_COMMIT HEAD | Out-String
-        if (-not $files) { $files = "" }
-        $encoded = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($files))
-        Write-Host "Modified files: $files"
-        Write-Host "##vso[task.setvariable variable=MODIFIED_FILES]$encoded"
-    displayName: "Get changed files since last successful run"
+  #     if (Test-Path $artifactPath) {
+  #       $last = Get-Content $artifactPath
+  #       Write-Host "Found last successful commit: $last"
+  #     }
+  #     #Necessary for first run or when no artifacts can be found
+  #     else {
+  #       $last = "$(Build.SourceVersion)^"
+  #       Write-Host "No previous successful run found. Using fallback commit: $last"
+  #     }
+  #     Write-Host "##vso[task.setvariable variable=LAST_SUCCESSFUL_COMMIT]$last"
+  #   displayName: "Resolve last successful commit"
+
+  # - task: PowerShell@2
+  #   name: GetFiles
+  #   inputs:
+  #     targetType: inline
+  #     script: |
+  #       git fetch --all
+  #       Write-Host "Diff from $Env:LAST_SUCCESSFUL_COMMIT to HEAD"
+  #       $files = git diff --name-status -M -z $Env:LAST_SUCCESSFUL_COMMIT HEAD | Out-String
+  #       if (-not $files) { $files = "" }
+  #       $encoded = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($files))
+  #       Write-Host "Modified files: $files"
+  #       Write-Host "##vso[task.setvariable variable=MODIFIED_FILES]$encoded"
+  #   displayName: "Get changed files since last successful run"
 
   - powershell: |
-      node dist/index.js --action="discoverTests" --path="$Env:BUILD_SOURCESDIRECTORY" --octaneUrl="http://localhost:8080/dev" --sharedSpace="$env:SHAREDSPACE" --workspace="$env:WORKSPACE" --clientSecret="$env:CLIENTSECRE" --clientId="$env:CLIENTID" --logLevel=1
+      node dist/index.js --action="discoverTests" --path="$Env:BUILD_SOURCESDIRECTORY" --octaneUrl="$(octaneUrl)" --sharedSpace="$(sharedSpaceId)" --workspace="$env:WORKSPACE" --clientSecret="$(octaneClientSecret)" --clientId="$(octaneClientId)" --logLevel=1
     env:
       MODIFIED_FILES: $(GetFiles.MODIFIED_FILES)
-      CLIENTSECRET: $(CLIENTSECRE)
-      CLIENTID: $(CLIENTID)
+      # CLIENTSECRET: $(CLIENTSECRE)
+      # CLIENTID: $(CLIENTID)
       REPOURL: $(Build.Repository.Uri)
     displayName: Discovery
 
   - powershell: |
-     mkdir -Force "$(Pipeline.Workspace)/last-successful"
-     echo $(Build.SourceVersion) > "$(Pipeline.Workspace)/last-successful/last_successful_commit.txt"
+      echo $(Build.SourceVersion) > last_successful_commit.txt
     displayName: "Store current commit SHA"
 
-  - publish: $(Pipeline.Workspace)/last-successful
+  - publish: last_successful_commit.txt
     artifact: last-successful
     displayName: "Publish last successful commit SHA"
 
