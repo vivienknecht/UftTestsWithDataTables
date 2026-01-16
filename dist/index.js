@@ -40943,6 +40943,7 @@ const getExistingUFTTests = (octaneConnection, octaneAPi) => __awaiter(void 0, v
 });
 exports.getExistingUFTTests = getExistingUFTTests;
 const sendCreateTestEventToOctane = (octaneConnection, octaneApi, name, packageName, className, description, scmRepositoryId) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
     try {
         const body = {
             "data": [
@@ -40971,7 +40972,7 @@ const sendCreateTestEventToOctane = (octaneConnection, octaneApi, name, packageN
         yield octaneConnection.executeCustomRequest(`${octaneApi}/tests`, alm_octane_js_rest_sdk_1.Octane.operationTypes.create, body);
     }
     catch (error) {
-        LOGGER.error("Error occurred while sending create test event to Octane: ");
+        LOGGER.error("Error occurred while sending create test event to Octane: " + ((_b = (_a = error === null || error === void 0 ? void 0 : error.errors) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.description));
     }
 });
 exports.sendCreateTestEventToOctane = sendCreateTestEventToOctane;
