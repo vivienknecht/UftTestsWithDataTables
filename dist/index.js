@@ -40971,7 +40971,7 @@ const sendCreateTestEventToOctane = (octaneConnection, octaneApi, name, packageN
         yield octaneConnection.executeCustomRequest(`${octaneApi}/tests`, alm_octane_js_rest_sdk_1.Octane.operationTypes.create, body);
     }
     catch (error) {
-        LOGGER.error("Error occurred while sending create test event to Octane: " + error.errors.description);
+        LOGGER.error("Error occurred while sending create test event to Octane: ");
     }
 });
 exports.sendCreateTestEventToOctane = sendCreateTestEventToOctane;
