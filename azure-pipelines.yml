@@ -19,16 +19,16 @@ steps:
       versionSpec: "22.x"
     displayName: "Use Node.js"
 
-  - task: octane-start-task-private@1
-    inputs:
-      OctaneServiceConnection: 'felix1OctaneConnection'
-      WorkspaceList: '1002'
-      CreatePipelineCheckbox: true
+  # - task: octane-start-task-private@1
+  #   inputs:
+  #     OctaneServiceConnection: 'felix1OctaneConnection'
+  #     WorkspaceList: '1002'
+  #     CreatePipelineCheckbox: true
 
   - task: octane-test-runner-start-task-private@1
     inputs:
-      OctaneServiceConnection: 'felix1OctaneConnection'
-      WorkspaceList: '1002'
+      OctaneServiceConnection: 'octaneConnectionForDiscovery'
+      WorkspaceList: '5001'
       Framework: 'uft'
       GitRepositoryURL: 'https://github.com/vivienknecht/UftTestsWithDataTables'
 
@@ -86,7 +86,7 @@ steps:
 
   - task: octane-get-params-task@1
     inputs:
-      OctaneServiceConnection: 'felix1OctaneConnection'
+      OctaneServiceConnection: 'octaneConnectionForDiscovery'
 
   - powershell: |
       node dist/index.js --action="discoverTests" --path="$Env:BUILD_SOURCESDIRECTORY" --octaneUrl="$(octaneUrl)" --sharedSpace="$(sharedSpaceId)" --workspace="$env:WORKSPACE" --clientSecret="$(octaneClientSecret)" --clientId="$(octaneClientId)" --logLevel=1
@@ -133,8 +133,8 @@ steps:
 
   - task: octane-end-task-private@1
     inputs:
-      OctaneServiceConnection: 'felix1OctaneConnection'
-      WorkspaceList: '1002'
+      OctaneServiceConnection: 'octaneConnectionForDiscovery'
+      WorkspaceList: '5001'
       Framework: 'uft'
     env:
       UNIT_TEST_RESULTS_GLOB_PATTERN: ${{ parameters.unitTestResultsGlobPattern }}
