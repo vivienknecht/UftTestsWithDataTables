@@ -40901,9 +40901,14 @@ const getScmRepo = (octaneConnection, octaneApi) => __awaiter(void 0, void 0, vo
 exports.getScmRepo = getScmRepo;
 const getExistingTestsInScmRepo = (octaneConnection, octaneApi, scmRepositoryId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const existingTests = yield octaneConnection.executeCustomRequest(`${octaneApi}/tests/?query=\"scm_repository EQ {id EQ ^${scmRepositoryId}^}\"&query=\"testing_tool_type EQ {id EQ ^list_node.testing_tool_type.uft^}\"&fields=executable,name,package,class_name,description`, alm_octane_js_rest_sdk_1.Octane.operationTypes.get);
+        const existingTests = yield octaneConnection.get(alm_octane_js_rest_sdk_1.Octane.entityTypes.tests).fields('id', 'executable', 'name', 'package', 'class_name', 'description')
+            .query(alm_octane_js_rest_sdk_1.Query.field('testing_tool_type').equal(alm_octane_js_rest_sdk_1.Query.field('id').equal('list_node.testing_tool_type.uft')).build())
+            .and().query(alm_octane_js_rest_sdk_1.Query.field('scm_repository').equal(alm_octane_js_rest_sdk_1.Query.field('id').equal(scmRepositoryId)).build())
+            .execute();
+        // const existingTests = await octaneConnection.executeCustomRequest(`${octaneApi}/tests/?query=\"scm_repository EQ {id EQ ^${scmRepositoryId}^}\"&query=\"testing_tool_type EQ {id EQ ^list_node.testing_tool_type.uft^}\"&fields=executable,name,package,class_name,description`,
+        //     Octane.operationTypes.get);
         LOGGER.info("The repo of the existing tests in scm repository is: " + scmRepositoryId);
-        LOGGER.info("The existing tests in scm repository are: " + JSON.stringify(existingTests.data[0]));
+        LOGGER.info("The existing tests in scm repository are: " + JSON.stringify(existingTests.data.length));
         const automatedTests = [];
         for (const testData of existingTests.data) {
             const automatedTest = {
@@ -40928,8 +40933,6 @@ const getExistingUFTTests = (octaneConnection, octaneAPi) => __awaiter(void 0, v
     try {
         const existingUftTests = yield octaneConnection.get(alm_octane_js_rest_sdk_1.Octane.entityTypes.tests).fields('id', 'executable', 'name', 'package', 'class_name', 'description')
             .query(alm_octane_js_rest_sdk_1.Query.field('testing_tool_type').equal(alm_octane_js_rest_sdk_1.Query.field('id').equal('list_node.testing_tool_type.uft')).build()).execute();
-        // const existingUftTests = await octaneConnection.executeCustomRequest(`${octaneAPi}/tests/?query=\"testing_tool_type EQ {id EQ ^list_node.testing_tool_type.uft^}\"&fields=executable,name,package,class_name,description`,
-        //     Octane.operationTypes.get);
         LOGGER.info("The existing UFT tests are: " + JSON.stringify(existingUftTests.data));
         LOGGER.info(("The length of existing UFT tests is: " + existingUftTests.data.length));
         const automatedTests = [];
