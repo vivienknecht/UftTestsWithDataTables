@@ -40513,7 +40513,7 @@ class Discovery {
                             addedTests.push(addGUITest);
                         }
                         else if (addedFile.endsWith(".st")) {
-                            const addAPITest = yield (0, CreateAutomatedTests_1.createAutomatedTestsFromGUI)(path.dirname(addedFileRenamed), this.API_TEST_TYPE);
+                            const addAPITest = yield (0, CreateAutomatedTests_1.createAutomatedTestFromAPI)(path.dirname(addedFileRenamed), this.API_TEST_TYPE);
                             addedTests.push(addAPITest);
                         }
                     }
