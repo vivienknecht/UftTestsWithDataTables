@@ -40495,6 +40495,11 @@ class Discovery {
                             name: path.basename(deletedFile),
                             relativePath: deletedFile
                         };
+                        const filteredRemovedDataTables = yield this.removeFalsePositiveDataTablesAtUpdate(existingTests, [deletedDataTable]);
+                        if (filteredRemovedDataTables.length === 0) {
+                            LOGGER.debug("The removed data table is a false positive. " + deletedDataTable.name);
+                            continue;
+                        }
                         removedDataTables.push(deletedDataTable);
                     }
                     continue;
@@ -40914,15 +40919,18 @@ const getExistingTestsInScmRepo = (octaneConnection, octaneApi, scmRepositoryId)
         return automatedTests;
     }
     catch (error) {
-        LOGGER.error("Error occurred while getting existing tests in scm repository from Octane: " + error.errors.description);
+        LOGGER.error("Error occurred while getting existing tests in scm repository from Octane: " + error.message);
         return [];
     }
 });
 exports.getExistingTestsInScmRepo = getExistingTestsInScmRepo;
 const getExistingUFTTests = (octaneConnection, octaneAPi) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const existingUftTests = yield octaneConnection.executeCustomRequest(`${octaneAPi}/tests/?query=\"testing_tool_type EQ {id EQ ^list_node.testing_tool_type.uft^}\"&fields=executable,name,package,class_name,description`, alm_octane_js_rest_sdk_1.Octane.operationTypes.get);
+        const existingUftTests = yield octaneConnection.get(alm_octane_js_rest_sdk_1.Octane.entityTypes.tests).query(alm_octane_js_rest_sdk_1.Query.field("testing_tool_type").equal(alm_octane_js_rest_sdk_1.Query.field("id").equal("list_node.testing_tool_type.uft"))).execute();
+        // const existingUftTests = await octaneConnection.executeCustomRequest(`${octaneAPi}/tests/?query=\"testing_tool_type EQ {id EQ ^list_node.testing_tool_type.uft^}\"&fields=executable,name,package,class_name,description`,
+        //     Octane.operationTypes.get);
         LOGGER.info("The existing UFT tests are: " + JSON.stringify(existingUftTests.data));
+        LOGGER.info(("The length of existing UFT tests is: " + existingUftTests.data.length));
         const automatedTests = [];
         for (const testData of existingUftTests.data) {
             const automatedTest = {
@@ -40969,6 +40977,7 @@ const sendCreateTestEventToOctane = (octaneConnection, octaneApi, name, packageN
                 }
             ]
         };
+        // octaneConnection.create
         yield octaneConnection.executeCustomRequest(`${octaneApi}/tests`, alm_octane_js_rest_sdk_1.Octane.operationTypes.create, body);
     }
     catch (error) {
