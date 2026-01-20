@@ -40999,7 +40999,7 @@ const sendCreateTestEventToOctane = (octaneConnection, octaneApi, name, packageN
                 id: yield getTestRunnerId(octaneConnection, octaneApi)
             }
         };
-        yield octaneConnection.create(alm_octane_js_rest_sdk_1.Octane.entityTypes.tests, body).execute();
+        yield octaneConnection.create(alm_octane_js_rest_sdk_1.Octane.entityTypes.tests, body2).execute();
         //await octaneConnection.executeCustomRequest(`${octaneApi}/tests`, Octane.operationTypes.create, body);
     }
     catch (error) {
@@ -41018,7 +41018,11 @@ const sendUpdateTestEventToOctane = (octaneConnection, octaneApi, testId, name, 
                     "package": packageName,
                     "description": description,
                     "class_name": className,
-                    "executable": isExecutable
+                    "executable": isExecutable,
+                    "test_runner": {
+                        "type": "executor",
+                        "id": yield getTestRunnerId(octaneConnection, octaneApi)
+                    }
                 }
             ]
         };
