@@ -40979,6 +40979,26 @@ const sendCreateTestEventToOctane = (octaneConnection, octaneApi, name, packageN
                 }
             ]
         };
+        const body2 = {
+            testing_tool_type: {
+                type: "list_node",
+                id: "list_node.testing_tool_type.uft"
+            },
+            subtype: "test_automated",
+            name: name,
+            package: packageName,
+            class_name: className,
+            description: description,
+            scm_repository: {
+                type: "scm_repository",
+                id: scmRepositoryId
+            },
+            executable: true,
+            test_runner: {
+                type: "executor",
+                id: yield getTestRunnerId(octaneConnection, octaneApi)
+            }
+        };
         yield octaneConnection.create(alm_octane_js_rest_sdk_1.Octane.entityTypes.tests, body).execute();
         //await octaneConnection.executeCustomRequest(`${octaneApi}/tests`, Octane.operationTypes.create, body);
     }
