@@ -41008,27 +41008,27 @@ const sendCreateTestEventToOctane = (octaneConnection, octaneApi, name, packageN
 exports.sendCreateTestEventToOctane = sendCreateTestEventToOctane;
 const sendUpdateTestEventToOctane = (octaneConnection, octaneApi, testId, name, packageName, description, className, isExecutable) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        let test = yield octaneConnection.get(alm_octane_js_rest_sdk_1.Octane.entityTypes.tests).at(testId).fields('name', 'package', 'class_name', 'description', 'executable').execute();
-        test.name = name;
-        test.package = packageName;
-        test.class_name = className;
-        test.description = description;
-        test.executable = isExecutable;
-        LOGGER.info("The test to update in Octane is: " + JSON.stringify(test));
-        // const body = {
-        //     "data": [
-        //         {
-        //             "subtype": "test_automated",
-        //             "id": testId,
-        //             "name": name,
-        //             "package": packageName,
-        //             "description": description,
-        //             "class_name": className,
-        //             "executable": isExecutable
-        //         }
-        //     ]
-        // }
-        yield octaneConnection.update(alm_octane_js_rest_sdk_1.Octane.entityTypes.tests, test).execute();
+        // let test = await octaneConnection.get(Octane.entityTypes.tests).at(testId).fields('name', 'package', 'class_name', 'description', 'executable').execute();
+        // test.name = name;
+        // test.package = packageName;
+        // test.class_name = className;
+        // test.description = description;
+        // test.executable = isExecutable;
+        //  LOGGER.info("The test to update in Octane is: " + JSON.stringify(test));
+        const body = {
+            "data": [
+                {
+                    "subtype": "test_automated",
+                    "id": testId,
+                    "name": name,
+                    "package": packageName,
+                    "description": description,
+                    "class_name": className,
+                    "executable": isExecutable
+                }
+            ]
+        };
+        yield octaneConnection.update(alm_octane_js_rest_sdk_1.Octane.entityTypes.tests, body).execute();
         // await octaneConnection.executeCustomRequest(`${octaneApi}/tests`, Octane.operationTypes.update, body);
     }
     catch (error) {
