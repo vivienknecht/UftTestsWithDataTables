@@ -40926,7 +40926,7 @@ const getExistingTestsInScmRepo = (octaneConnection, octaneApi, scmRepositoryId)
 exports.getExistingTestsInScmRepo = getExistingTestsInScmRepo;
 const getExistingUFTTests = (octaneConnection, octaneAPi) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const existingUftTests = yield octaneConnection.get(alm_octane_js_rest_sdk_1.Octane.entityTypes.tests).query(alm_octane_js_rest_sdk_1.Query.field("testing_tool_type").equal(alm_octane_js_rest_sdk_1.Query.field("id").equal("list_node.testing_tool_type.uft"))).execute();
+        const existingUftTests = yield octaneConnection.get(alm_octane_js_rest_sdk_1.Octane.entityTypes.tests).query(alm_octane_js_rest_sdk_1.Query.field('testing_tool_type').equal(alm_octane_js_rest_sdk_1.Query.field('id').equal('list_node.testing_tool_type.uft')).build()).execute();
         // const existingUftTests = await octaneConnection.executeCustomRequest(`${octaneAPi}/tests/?query=\"testing_tool_type EQ {id EQ ^list_node.testing_tool_type.uft^}\"&fields=executable,name,package,class_name,description`,
         //     Octane.operationTypes.get);
         LOGGER.info("The existing UFT tests are: " + JSON.stringify(existingUftTests.data));
