@@ -40905,8 +40905,6 @@ const getExistingTestsInScmRepo = (octaneConnection, octaneApi, scmRepositoryId)
             .query(alm_octane_js_rest_sdk_1.Query.field('scm_repository').equal(alm_octane_js_rest_sdk_1.Query.field('id').equal(scmRepositoryId))
             .and(alm_octane_js_rest_sdk_1.Query.field('testing_tool_type').equal(alm_octane_js_rest_sdk_1.Query.field('id').equal('list_node.testing_tool_type.uft'))).build())
             .execute();
-        // const existingTests = await octaneConnection.executeCustomRequest(`${octaneApi}/tests/?query=\"scm_repository EQ {id EQ ^${scmRepositoryId}^}\"&query=\"testing_tool_type EQ {id EQ ^list_node.testing_tool_type.uft^}\"&fields=executable,name,package,class_name,description`,
-        //     Octane.operationTypes.get);
         LOGGER.info("The repo of the existing tests in scm repository is: " + scmRepositoryId);
         LOGGER.info("The existing tests in scm repository are: " + JSON.stringify(existingTests.data.length));
         const automatedTests = [];
@@ -40981,8 +40979,8 @@ const sendCreateTestEventToOctane = (octaneConnection, octaneApi, name, packageN
                 }
             ]
         };
-        // octaneConnection.create
-        yield octaneConnection.executeCustomRequest(`${octaneApi}/tests`, alm_octane_js_rest_sdk_1.Octane.operationTypes.create, body);
+        yield octaneConnection.create(alm_octane_js_rest_sdk_1.Octane.entityTypes.tests, body).execute();
+        //await octaneConnection.executeCustomRequest(`${octaneApi}/tests`, Octane.operationTypes.create, body);
     }
     catch (error) {
         LOGGER.error("Error occurred while sending create test event to Octane: " + error.message);
