@@ -41699,6 +41699,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.verifyPath = exports.removeFalsePositiveDataTablesAtUpdate = exports.removeFalsePositiveDataTables = exports.getPackageNameAtSync = exports.getClassNameAtSync = exports.getTestNameAtSync = exports.getDescriptionForAPITest = exports.getAPITestDoc = exports.customDOMParser = exports.convertToXml = exports.checkIfFileExists = exports.convertToHtml = exports.getDescriptionForGUITest = exports.getGUITestDoc = void 0;
 const path = __nccwpck_require__(6928);
 const fs = __nccwpck_require__(1943);
+const fs1 = __nccwpck_require__(9896);
 const logger_1 = __nccwpck_require__(7893);
 const CFB = __nccwpck_require__(908);
 const xmldom_1 = __nccwpck_require__(8351);
@@ -41924,8 +41925,21 @@ const verifyPath = (pathToRepo) => __awaiter(void 0, void 0, void 0, function* (
         throw new Error("The provided path contains invalid control characters.");
     }
     const resolvedPath = path.resolve(pathToRepo);
-    const processedEnv = path.resolve(process.env.BUILD_SOURCESDIRECTORY);
-    LOGGER.info("The BUILD_SOURCESDIRECTORY is: " + processedEnv + " and the resolved path is: " + resolvedPath);
+    const allowedRoot = path.resolve(process.env.BUILD_SOURCESDIRECTORY);
+    if (!resolvedPath.startsWith(allowedRoot + path.sep)) {
+        throw new Error('Path escapes the repository root');
+    }
+    const stats = fs1.statSync(resolvedPath);
+    if (!stats.isDirectory()) {
+        throw new Error('The provided path is not a directory');
+    }
+    const realPath = fs1.realpathSync(resolvedPath);
+    if (!realPath.startsWith(allowedRoot)) {
+        throw new Error('Path escapes the repository root via symlink');
+    }
+    if (realPath === path.parse(realPath).root) {
+        throw new Error('The provided path is the root directory, which is not allowed');
+    }
     return true;
 });
 exports.verifyPath = verifyPath;
