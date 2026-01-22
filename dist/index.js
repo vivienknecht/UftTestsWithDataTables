@@ -41148,6 +41148,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         }
         else if (actionType === "discoverTests") {
             LOGGER.info("The path is: " + path);
+            const processedEnv = process.env.BUILD_SOURCESDIRECTORY;
+            LOGGER.info("The BUILD_SOURCESDIRECTORY is: " + processedEnv);
             if (!path && !isFullScan && !octaneUrl && !sharedSpace && !workspace && !clientId && !clientSecret) {
                 tl.setResult(tl.TaskResult.Failed, "You have to specify all Octane connection parameters, the path to the repository to discover UFT tests from and whether full scan or sync is required.");
                 return;
@@ -41913,6 +41915,16 @@ const removeFalsePositiveDataTablesAtUpdate = (tests, scmResourceFiles) => __awa
     return scmResourceFiles;
 });
 exports.removeFalsePositiveDataTablesAtUpdate = removeFalsePositiveDataTablesAtUpdate;
+const verifyPath = (pathToRepo) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!pathToRepo || pathToRepo.length > 4096) {
+        throw new Error("The provided path is either empty or exceeds the maximum length of 4096 characters.");
+    }
+    const controlChars = /[\u0000-\u001F\u007F]/;
+    if (controlChars.test(pathToRepo)) {
+        throw new Error("The provided path contains invalid control characters.");
+    }
+    return true;
+});
 
 
 /***/ }),
