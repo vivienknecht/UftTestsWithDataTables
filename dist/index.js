@@ -41926,7 +41926,7 @@ const verifyPath = (pathToRepo) => __awaiter(void 0, void 0, void 0, function* (
     }
     const resolvedPath = path.resolve(pathToRepo);
     const allowedRoot = path.resolve(process.env.BUILD_SOURCESDIRECTORY);
-    if (!resolvedPath.startsWith(allowedRoot + path.sep)) {
+    if (!resolvedPath.startsWith(allowedRoot)) {
         throw new Error('Path escapes the repository root');
     }
     const stats = fs1.statSync(resolvedPath);
