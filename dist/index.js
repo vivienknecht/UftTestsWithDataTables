@@ -40762,7 +40762,6 @@ class ScanRepo {
                 else {
                     for (const item of items) {
                         const itemPath = path.join(pathToRepo, item);
-                        LOGGER.info("Scanning item: " + itemPath);
                         const stats = yield fs.promises.lstat(itemPath);
                         if (stats.isDirectory() || stats.isSymbolicLink()) {
                             if (stats.isSymbolicLink()) {
@@ -40851,8 +40850,8 @@ const LOGGER = new logger_1.default("octaneClient.ts");
 const getTestRunnerId = (octaneConnection, octaneApi) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const pipelineName = process.env.BUILD_DEFINITIONNAME;
+        LOGGER.info("The pipeline name is: " + pipelineName);
         const testRunner = yield octaneConnection.executeCustomRequest(`${octaneApi}/executors?query=\"ci_job EQ {name EQ ^${pipelineName}*^}\"`, alm_octane_js_rest_sdk_1.Octane.operationTypes.get);
-        LOGGER.info("nso;fm");
         return testRunner.data[0].id;
     }
     catch (error) {
