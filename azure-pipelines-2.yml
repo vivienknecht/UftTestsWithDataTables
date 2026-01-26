@@ -28,7 +28,7 @@ steps:
   - task: octane-test-runner-start-task-private@1
     inputs:
       OctaneServiceConnection: "octaneConnectionForDiscovery"
-      WorkspaceList: "8002"
+      WorkspaceList: "8003"
       Framework: "uft"
       GitRepositoryURL: "https://github.com/vivienknecht/UftTestsWithDataTables"
 
