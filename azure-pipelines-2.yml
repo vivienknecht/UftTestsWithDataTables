@@ -51,9 +51,9 @@ steps:
   #     downloadPath: "$(Pipeline.Workspace)\\last-successful"
   #   continueOnError: true
 
-  # - powershell: |
-  #     ./eng/detect-changed-files.ps1
-  #   displayName: Detect changed files since last successful run
+  - powershell: |
+      ./eng/detect-changed-files.ps1
+    displayName: Detect changed files since last successful run
 
   # - powershell: |
   #     $artifactPath = "$(Pipeline.Workspace)/last-successful/last_successful_commit.txt"
