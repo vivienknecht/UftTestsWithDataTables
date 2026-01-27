@@ -1,1 +1,1 @@
-export declare const convertTests: (testsToRun: string, framework: string, rootDirectory: string) => string | undefined;
+export declare const convertTests: (testsToRun: string, framework: string, rootDirectory: string, customFramework?: string) => string | undefined;

@@ -52,7 +52,6 @@ class ScanRepo {
                 else {
                     for (const item of items) {
                         const itemPath = path.join(pathToRepo, item);
-                        LOGGER.info("Scanning item: " + itemPath);
                         const stats = yield fs.promises.lstat(itemPath);
                         if (stats.isDirectory() || stats.isSymbolicLink()) {
                             if (stats.isSymbolicLink()) {

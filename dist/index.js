@@ -41070,6 +41070,33 @@ exports.getScmResourceFilesFromOctane = getScmResourceFilesFromOctane;
 
 /***/ }),
 
+/***/ 9407:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.convertTests = void 0;
+const testsToRunParser_1 = __nccwpck_require__(4745);
+const testsToRunConverter_1 = __nccwpck_require__(1644);
+const logger_1 = __nccwpck_require__(7893);
+const LOGGER = new logger_1.default("main.ts");
+const convertTests = (testsToRun, framework, rootDirectory, customFramework) => {
+    LOGGER.warn("USING CONVERT TESTS");
+    const parsedTestsToRun = (0, testsToRunParser_1.default)(testsToRun);
+    if (testsToRunParser_1.default.length === 0) {
+        LOGGER.error("No tests to run have been found.");
+        return;
+    }
+    const convertedTests = (0, testsToRunConverter_1.default)(parsedTestsToRun, framework, rootDirectory, customFramework);
+    console.log("The converted tests ", convertedTests);
+    return convertedTests;
+};
+exports.convertTests = convertTests;
+
+
+/***/ }),
+
 /***/ 1730:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -41117,11 +41144,10 @@ const yargs_1 = __nccwpck_require__(5229);
 const helpers_1 = __nccwpck_require__(7763);
 const logger_1 = __nccwpck_require__(7893);
 const config_1 = __nccwpck_require__(1122);
-const testsToRunConverter_1 = __nccwpck_require__(1644);
-const testsToRunParser_1 = __nccwpck_require__(4745);
 const Discovery_1 = __nccwpck_require__(6672);
 const tl = __nccwpck_require__(358);
 const utils_1 = __nccwpck_require__(5268);
+const index_1 = __nccwpck_require__(9407);
 const LOGGER = new logger_1.default("main.ts");
 let args;
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -41140,7 +41166,12 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             tl.setResult(tl.TaskResult.Failed, "You have to specify an action to execute: convertTests or discoverTests.");
         }
         if (actionType === "convertTests") {
-            convertTests();
+            const framework = (0, config_1.getConfig)().framework;
+            const rootDirectory = process.env.BUILD_SOURCESDIRECTORY || "";
+            const convertedTests = (0, index_1.convertTests)(args.testsToRun, framework, rootDirectory);
+            if (convertedTests) {
+                tl.setVariable("testsToRunConverted", convertedTests);
+            }
         }
         else if (actionType === "discoverTests") {
             LOGGER.info("The path is: " + path);
@@ -41160,16 +41191,6 @@ const discoverTests = (path, isFullScan, octaneUrl, sharedSpace, workspace, clie
     const discovery = new Discovery_1.default(isFullScan, octaneUrl, sharedSpace, workspace, clientId, clientSecret);
     yield discovery.startDiscovery(path);
 });
-const convertTests = () => {
-    const parsedTestsToRun = (0, testsToRunParser_1.default)(args.testsToRun);
-    if (testsToRunParser_1.default.length === 0) {
-        LOGGER.error("No tests to run have been found.");
-        return;
-    }
-    const convertedTests = (0, testsToRunConverter_1.default)(parsedTestsToRun);
-    tl.setVariable("testsToRunConverted", convertedTests);
-    console.log("The converted tests ", convertedTests);
-};
 const loadArguments = () => {
     args = (0, yargs_1.default)((0, helpers_1.hideBin)(process.argv))
         .option("framework", {
@@ -41274,16 +41295,13 @@ main();
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const xml_js_1 = __nccwpck_require__(3675);
-const config_1 = __nccwpck_require__(1122);
 const customFrameworkParser_1 = __nccwpck_require__(3249);
 const logger_1 = __nccwpck_require__(7893);
 const LOGGER = new logger_1.default("testsToRunConverter.ts");
 const CUSTOM_FRAMEWORK_PACKAGE_PLACEHOLDER = "$package";
 const CUSTOM_FRAMEWORK_CLASS_PLACEHOLDER = "$class";
 const CUSTOM_FRAMEWORK_TEST_PLACEHOLDER = "$testName";
-const convertTestsToRun = (testsToRun) => {
-    const framework = (0, config_1.getConfig)().framework;
-    const rootDirectory = process.env.BUILD_SOURCESDIRECTORY || "";
+const convertTestsToRun = (testsToRun, framework, rootDirectory, customFramework) => {
     if (!framework) {
         throw Error("Could not get framework from config.");
     }
@@ -41299,7 +41317,10 @@ const convertTestsToRun = (testsToRun) => {
         case "uft" /* Framework.UFT */:
             return convertUftTestsToRun(testsToRun, rootDirectory);
         case "custom" /* Framework.Custom */:
-            return convertCustomTestsToRun(testsToRun);
+            if (!customFramework) {
+                throw new Error("Missing 'customFramework' argument for converting custom framework.");
+            }
+            return convertCustomTestsToRun(testsToRun, customFramework);
         default:
             throw Error(`Unsupported framework: '${framework}'. See the list of available parameters at https://github.com/MicroFocus/sdp-sdm-tests-to-run-conversion?tab=readme-ov-file#412-parameters.`);
     }
@@ -41396,9 +41417,9 @@ const convertUftTestsToRun = (testsToRun, rootDirectory) => {
     LOGGER.debug(`Successfully converted the tests to run: ${convertedTestsToRun}`);
     return convertedTestsToRun;
 };
-const convertCustomTestsToRun = (testsToRun) => {
+const convertCustomTestsToRun = (testsToRun, customFramework) => {
     LOGGER.info(`Converting testsToRun to a custom format...`);
-    const customFramework = (0, config_1.getConfig)().customFramework;
+    // const customFramework = getConfig().customFramework;
     if (!customFramework) {
         throw new Error(`Missing 'customFramework' argument for converting custom framework.`);
     }

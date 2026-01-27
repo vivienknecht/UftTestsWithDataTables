@@ -1,3 +1,3 @@
 import Test from "./dto/Test";
-declare const convertTestsToRun: (testsToRun: Test[], framework: string, rootDirectory: string) => string;
+declare const convertTestsToRun: (testsToRun: Test[], framework: string, rootDirectory: string, customFramework?: string) => string;
 export default convertTestsToRun;

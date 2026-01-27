@@ -13,9 +13,16 @@ exports.getScmResourceFilesFromOctane = exports.deleteScmResourceFile = exports.
 const alm_octane_js_rest_sdk_1 = require("@microfocus/alm-octane-js-rest-sdk");
 const logger_1 = require("../utils/logger");
 const LOGGER = new logger_1.default("octaneClient.ts");
+const escapeSpecialChars = (input) => {
+    return input.replace(/[+\-!(){}[\]^"~*?:\\/]/g, "\\$&");
+};
 const getTestRunnerId = (octaneConnection, octaneApi) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const pipelineName = process.env.BUILD_DEFINITIONNAME;
+        let pipelineName;
+        if (process.env.BUILD_DEFINITIONNAME) {
+            pipelineName = escapeSpecialChars(process.env.BUILD_DEFINITIONNAME);
+        }
+        LOGGER.debug("The pipeline name is: " + pipelineName);
         const testRunner = yield octaneConnection.executeCustomRequest(`${octaneApi}/executors?query=\"ci_job EQ {name EQ ^${pipelineName}*^}\"`, alm_octane_js_rest_sdk_1.Octane.operationTypes.get);
         return testRunner.data[0].id;
     }
