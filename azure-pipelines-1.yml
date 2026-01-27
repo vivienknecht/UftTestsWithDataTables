@@ -32,9 +32,9 @@ steps:
       Framework: "uft"
       GitRepositoryURL: "https://github.com/vivienknecht/UftTestsWithDataTables"
 
-  - powershell: |
-      node dist/task/index.js --action="convertTests" --framework="uft" --testsToRun=${env:TESTSTORUN} --logLevel=1
-    displayName: TestConversion
+  # - powershell: |
+  #     node dist/task/index.js --action="convertTests" --framework="uft" --testsToRun=${env:TESTSTORUN} --logLevel=1
+  #   displayName: TestConversion
 
   - checkout: self
     fetchDepth: 0
@@ -89,8 +89,8 @@ steps:
       OctaneServiceConnection: "octaneConnectionForDiscovery"
 
   - powershell: |
-       node dist/task/index.js --action="discoverTests" --isFullScan=false --path="$Env:BUILD_SOURCESDIRECTORY" --octaneUrl="$(octaneUrl)" --sharedSpace="$(sharedSpaceId)" --workspace="$env:WORKSPACE" --clientSecret="$(octaneClientSecret)" --clientId="$(octaneClientId)" --logLevel=1
-      #node dist/index.js --action="discoverTests" --isFullScan=false --path="C:\dev\azure-devops-integration\agent\_work\8\s\escape" --octaneUrl="$(octaneUrl)" --sharedSpace="$(sharedSpaceId)" --workspace="$env:WORKSPACE" --clientSecret="$(octaneClientSecret)" --clientId="$(octaneClientId)" --logLevel=1
+      #  node dist/task/index.js --action="discoverTests" --isFullScan=false --path="$Env:BUILD_SOURCESDIRECTORY" --octaneUrl="$(octaneUrl)" --sharedSpace="$(sharedSpaceId)" --workspace="$env:WORKSPACE" --clientSecret="$(octaneClientSecret)" --clientId="$(octaneClientId)" --logLevel=1
+      node dist/index.js --action="discoverTests" --isFullScan=false --path="$Env:BUILD_SOURCESDIRECTORY" --octaneUrl="http://localhost:8080/dev/ui" --sharedSpace="1001" --workspace="$env:WORKSPACE" --clientSecret="@-pV0TAtzP47=my(e5nhafO" --clientId="azure-api-key_kvd21vm6499glie73225910oy" --logLevel=1
     env:
       MODIFIED_FILES_PATH: $(Pipeline.Workspace)/modified_files.bin
       REPOURL: $(Build.Repository.Uri)
