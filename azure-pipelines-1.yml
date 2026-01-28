@@ -84,9 +84,9 @@ steps:
   #       Write-Host "##vso[task.setvariable variable=MODIFIED_FILES]$encoded"
   #   displayName: "Get changed files since last successful run"
 
-  - task: octane-get-params-task@1
+  - task: octane-get-params-task-private@1
     inputs:
-      OctaneServiceConnection: "octaneConnectionForDiscovery"
+      OctaneServiceConnection: 'octaneConnectionForDiscovery'
 
   - powershell: |
       #  node dist/task/index.js --action="discoverTests" --isFullScan=false --path="$Env:BUILD_SOURCESDIRECTORY" --octaneUrl="$(octaneUrl)" --sharedSpace="$(sharedSpaceId)" --workspace="$env:WORKSPACE" --clientSecret="$(octaneClientSecret)" --clientId="$(octaneClientId)" --logLevel=1
