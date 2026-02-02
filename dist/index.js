@@ -41649,6 +41649,7 @@ const determineFileAndChangeType = (modifiedFiles, discoveredTests, existingTest
     const removedDataTables = [];
     const modifiedDataTables = [];
     const addedDataTables = [];
+    const re = /\.(xlsx|xls)$/;
     for (let i = 0; i < modifiedFiles.length;) {
         const status = modifiedFiles[i++];
         if (!status)
@@ -41673,8 +41674,8 @@ const determineFileAndChangeType = (modifiedFiles, discoveredTests, existingTest
                 modifiedTestsMap.push({ oldValue: oldTest, newValue: newTest });
                 LOGGER.debug(`Mapped: ${oldPath} → ${newPath}`);
             }
-            else if ((oldPath && oldPath.match(/\.(xlsx|xls)$/)) ||
-                (newPath && newPath.match(/\.(xlsx|xls)$/))) {
+            else if ((oldPath && re.test(oldPath.toLowerCase())) ||
+                (newPath && re.test(newPath.toLowerCase()))) {
                 const oldDataTable = {
                     name: path.basename(oldPath),
                     relativePath: oldPath,
