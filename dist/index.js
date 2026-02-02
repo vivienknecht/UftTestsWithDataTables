@@ -40767,20 +40767,6 @@ class ScanRepo {
                     }));
                     yield Promise.all(subDirPromises);
                 }
-                //   for (const item of items) {
-                //     const itemPath = path.join(pathToRepo, item);
-                //     const stats = await fs.promises.lstat(itemPath);
-                //     if (stats.isDirectory() || stats.isSymbolicLink()) {
-                //       if (stats.isSymbolicLink()) {
-                //         LOGGER.warn(
-                //           `${itemPath} is a symlink and symlinks are not supported and will be ignored.`,
-                //         );
-                //         continue;
-                //       }
-                //       await this.scanRepo(itemPath);
-                //     }
-                //   }
-                // }
             }
             catch (e) {
                 throw new Error("Error while scanning the repo: " + e.message);
@@ -41702,7 +41688,7 @@ const determineFileAndChangeType = (modifiedFiles, discoveredTests, existingTest
         }
         if (status === "D") {
             const deletedFile = (_c = modifiedFiles[i++]) !== null && _c !== void 0 ? _c : "";
-            if (deletedFile && deletedFile.match(/\.(st|tsp)$/)) {
+            if (deletedFile && re.test(deletedFile.toLowerCase())) {
                 const className = (0, utils_1.getClassNameAtSync)(deletedFile);
                 const testToDelete = {
                     name: (0, utils_1.getTestNameAtSync)(deletedFile),
@@ -41742,7 +41728,7 @@ const determineFileAndChangeType = (modifiedFiles, discoveredTests, existingTest
                     addedTests.push(addAPITest);
                 }
             }
-            else if (addedFile && addedFile.match(/\.(xlsx|xls)$/)) {
+            else if (addedFile && re.test(addedFile.toLowerCase())) {
                 const newDataTable = {
                     name: path.basename(addedFile),
                     relativePath: addedFile,
