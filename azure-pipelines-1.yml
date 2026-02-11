@@ -28,7 +28,7 @@ steps:
   - task: octane-test-runner-start-task-private@1
     inputs:
       OctaneServiceConnection: "octaneConnectionForDiscovery"
-      WorkspaceList: "6001"
+      WorkspaceList: "1002"
       Framework: "uft"
       GitRepositoryURL: "https://github.com/vivienknecht/UftTestsWithDataTables"
 
@@ -86,11 +86,11 @@ steps:
 
   - task: octane-get-params-task-private@1
     inputs:
-      OctaneServiceConnection: 'octaneConnectionForDiscovery'
+      OctaneServiceConnection: "octaneConnectionForDiscovery"
 
   - powershell: |
-      node dist/index.js --action="discoverTests" --isFullScan=true --path="$Env:BUILD_SOURCESDIRECTORY" --octaneUrl="$(octaneUrl)" --sharedSpace="$(octaneSharedSpaceId)" --workspace="$env:WORKSPACE" --clientSecret="$(octaneClientSecret)" --clientId="$(octaneClientId)" --logLevel=1
-      #node dist/task/index.js --action="discoverTests" --isFullScan=false --path="$Env:BUILD_SOURCESDIRECTORY" --octaneUrl="http://localhost:8080/dev" --sharedSpace="1001" --workspace="$env:WORKSPACE" --clientSecret="@-pV0TAtzP47=my(e5nhafO" --clientId="azure-api-key_kvd21vm6499glie73225910oy" --logLevel=1
+      node dist/cli/index.js --action="discoverTests" --isFullScan=true --path="$Env:BUILD_SOURCESDIRECTORY" --octaneUrl="$(octaneUrl)" --sharedSpace="$(octaneSharedSpaceId)" --workspace="1002" --clientSecret="$(octaneClientSecret)" --clientId="$(octaneClientId)" --logLevel=1
+      #node dist/task/index.js --action="discoverTests" --isFullScan=false --path="$Env:BUILD_SOURCESDIRECTORY" --octaneUrl="http://localhost:8080/dev" --sharedSpace="2002" --workspace="$env:WORKSPACE" --clientSecret="@-pV0TAtzP47=my(e5nhafO" --clientId="azure-api-key_kvd21vm6499glie73225910oy" --logLevel=1
     env:
       MODIFIED_FILES_PATH: $(Pipeline.Workspace)/modified_files.bin
       REPOURL: $(Build.Repository.Uri)
@@ -134,7 +134,7 @@ steps:
   - task: octane-end-task-private@1
     inputs:
       OctaneServiceConnection: "octaneConnectionForDiscovery"
-      WorkspaceList: "6001"
+      WorkspaceList: "1002"
       Framework: "uft"
     env:
       UNIT_TEST_RESULTS_GLOB_PATTERN: ${{ parameters.unitTestResultsGlobPattern }}
