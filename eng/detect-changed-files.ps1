@@ -23,12 +23,6 @@ git fetch --all --prune
 
 Write-Host "Diffing $lastCommit -> HEAD"
 
-# $files = git diff --name-status -M -z $lastCommit HEAD | Out-String
-# if (-not $files) { $files = "" }
-
-# $encoded = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($files))
-
-# Write-Host "##vso[task.setvariable variable=MODIFIED_FILES]$encoded"
 $files = git diff --name-status -M -z $lastCommit HEAD
 if (-not $files) { $files = "" }
 
