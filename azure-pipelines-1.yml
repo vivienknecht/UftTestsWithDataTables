@@ -46,6 +46,7 @@ steps:
 
   - powershell: |
       node dist/cli/index.js --action="discoverTests" --isFullScan=false --path="$env:BUILD_SOURCESDIRECTORY" --octaneUrl="$(octaneUrl)" --sharedSpace="$(octaneSharedSpaceId)" --workspace="$env:WORKSPACE" --clientSecret="$(octaneClientSecret)" --clientId="$(octaneClientId)" --logLevel=1    env:
+    env:
       MODIFIED_FILES_PATH: $(Pipeline.Workspace)/modified_files.bin
       REPOURL: $(Build.Repository.Uri)
     displayName: Discovery
