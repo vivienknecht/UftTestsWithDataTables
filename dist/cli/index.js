@@ -31213,7 +31213,7 @@ const alm_octane_js_rest_sdk_1 = __nccwpck_require__(3967);
 const logger_1 = __nccwpck_require__(7893);
 const LOGGER = new logger_1.default("octaneClient.ts");
 const escapeSpecialChars = (input) => {
-    return input.replace(/[+\-!(){}[\]^"~*?:\\/]/g, "\\$&");
+    return input.replace(/[+!(){}[\]^"~*?:\\/]/g, "\\$&");
 };
 const getTestRunnerId = (octaneConnection, octaneApi) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -31238,7 +31238,12 @@ exports.getTestRunnerId = getTestRunnerId;
 const getScmRepo = (octaneConnection, octaneApi) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const repoUrl = process.env.REPOURL || "";
-        const scmRepos = yield octaneConnection.executeCustomRequest(`${octaneApi}/scm_repositories/?query=\"repository EQ {url EQ ^${repoUrl}^}\"`, alm_octane_js_rest_sdk_1.Octane.operationTypes.get);
+        LOGGER.info("The repo url is: " + repoUrl);
+        const encoded = encodeURIComponent(`"repository EQ {url EQ ^${repoUrl}^}"`);
+        const query = `${octaneApi}/scm_repositories/?query=${encoded}`;
+        LOGGER.info("The query to get scm repository is: " + query);
+        const scmRepos = yield octaneConnection.executeCustomRequest(query, alm_octane_js_rest_sdk_1.Octane.operationTypes.get);
+        LOGGER.info("The scmRespos are: " + JSON.stringify(scmRepos));
         return scmRepos.data[0].id;
     }
     catch (error) {
