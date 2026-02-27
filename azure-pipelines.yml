@@ -11,91 +11,91 @@ pool: Default
 steps:
   - task: octane-test-runner-start-task-private@1
     inputs:
-      OctaneServiceConnection: "octaneConnectionForDiscovery"
-      WorkspaceList: "2001"
+      OctaneServiceConnection: "A"
+      WorkspaceList: "5007"
       Framework: "uft"
       GitRepositoryURL: "https://github.com/vivienknecht/UftTestsWithDataTables"
 
-  - checkout: self
-    fetchDepth: 0
+  # - checkout: self
+  #   fetchDepth: 0
 
-  - task: DownloadPipelineArtifact@2
-    displayName: "Download last successful commit SHA"
-    inputs:
-      buildType: "specific"
-      project: "$(System.TeamProjectId)"
-      definition: "$(System.DefinitionId)"
-      buildVersionToDownload: "latestFromBranch"
-      branchName: "$(Build.SourceBranch)"
-      artifactName: "last-successful"
-      downloadPath: "$(Pipeline.Workspace)\\last-successful"
-    continueOnError: true
+  # - task: DownloadPipelineArtifact@2
+  #   displayName: "Download last successful commit SHA"
+  #   inputs:
+  #     buildType: "specific"
+  #     project: "$(System.TeamProjectId)"
+  #     definition: "$(System.DefinitionId)"
+  #     buildVersionToDownload: "latestFromBranch"
+  #     branchName: "$(Build.SourceBranch)"
+  #     artifactName: "last-successful"
+  #     downloadPath: "$(Pipeline.Workspace)\\last-successful"
+  #   continueOnError: true
+
+  # # - powershell: |
+  # #     ./eng/detect-changed-files.ps1
+  # #   displayName: Detect changed files since last successful run
 
   # - powershell: |
-  #     ./eng/detect-changed-files.ps1
-  #   displayName: Detect changed files since last successful run
+  #     Write-Host "=== Detect changed files since last successful run ==="
 
-  - powershell: |
-      Write-Host "=== Detect changed files since last successful run ==="
+  #     $workspace     = $env:PIPELINE_WORKSPACE
+  #     $currentCommit = $env:BUILD_SOURCEVERSION.Trim()
 
-      $workspace     = $env:PIPELINE_WORKSPACE
-      $currentCommit = $env:BUILD_SOURCEVERSION.Trim()
+  #     $artifactPath = Join-Path $workspace "last-successful"
+  #     $commitFile   = Join-Path $artifactPath "last_successful_commit.txt"
 
-      $artifactPath = Join-Path $workspace "last-successful"
-      $commitFile   = Join-Path $artifactPath "last_successful_commit.txt"
+  #     # Resolve baseline commit
+  #     if (Test-Path $commitFile) {
+  #         $lastCommit = (Get-Content $commitFile -Raw).Trim()
+  #         Write-Host "Found last successful commit: $lastCommit"
+  #     }
+  #     else {
+  #         $lastCommit = "$currentCommit^"
+  #         Write-Host "No previous successful run found. Using fallback commit: $lastCommit"
+  #     }
 
-      # Resolve baseline commit
-      if (Test-Path $commitFile) {
-          $lastCommit = (Get-Content $commitFile -Raw).Trim()
-          Write-Host "Found last successful commit: $lastCommit"
-      }
-      else {
-          $lastCommit = "$currentCommit^"
-          Write-Host "No previous successful run found. Using fallback commit: $lastCommit"
-      }
+  #     Write-Host "##vso[task.setvariable variable=LAST_SUCCESSFUL_COMMIT]$lastCommit"
 
-      Write-Host "##vso[task.setvariable variable=LAST_SUCCESSFUL_COMMIT]$lastCommit"
+  #     # Ensure full git history
+  #     git fetch --all --prune
 
-      # Ensure full git history
-      git fetch --all --prune
+  #     Write-Host "Diffing $lastCommit -> HEAD"
 
-      Write-Host "Diffing $lastCommit -> HEAD"
+  #     $files = git diff --name-status -M -z $lastCommit HEAD
+  #     if (-not $files) { $files = "" }
 
-      $files = git diff --name-status -M -z $lastCommit HEAD
-      if (-not $files) { $files = "" }
+  #     $path = "$env:PIPELINE_WORKSPACE/modified_files.bin"
 
-      $path = "$env:PIPELINE_WORKSPACE/modified_files.bin"
+  #     [System.IO.File]::WriteAllBytes(
+  #         $path,
+  #         [Text.Encoding]::UTF8.GetBytes($files)
+  #     )
 
-      [System.IO.File]::WriteAllBytes(
-          $path,
-          [Text.Encoding]::UTF8.GetBytes($files)
-      )
+  #     Write-Host "Modified files written to $path"
 
-      Write-Host "Modified files written to $path"
+  #     # Persist current commit for next run
+  #     $currentCommit | Out-File "last_successful_commit.txt" -Encoding ascii
+  #   displayName: "Detect changed files since last successful run"
 
-      # Persist current commit for next run
-      $currentCommit | Out-File "last_successful_commit.txt" -Encoding ascii
-    displayName: "Detect changed files since last successful run"
+  # - task: octane-get-params-task@1
+  #   inputs:
+  #     OctaneServiceConnection: "octaneConnectionForDiscovery"
 
-  - task: octane-get-params-task@1
-    inputs:
-      OctaneServiceConnection: "octaneConnectionForDiscovery"
+  # - powershell: |
+  #      node dist/index.js --action="discoverTests" --isFullScan=true --path="$Env:BUILD_SOURCESDIRECTORY" --octaneUrl="$(octaneUrl)" --sharedSpace="$(sharedSpaceId)" --workspace="$env:WORKSPACE" --clientSecret="$(octaneClientSecret)" --clientId="$(octaneClientId)" --logLevel=1
+  #     #node dist/index.js --action="discoverTests" --isFullScan=false --path="C:\dev\azure-devops-integration\agent\_work\8\s\escape" --octaneUrl="$(octaneUrl)" --sharedSpace="$(sharedSpaceId)" --workspace="$env:WORKSPACE" --clientSecret="$(octaneClientSecret)" --clientId="$(octaneClientId)" --logLevel=1
+  #   env:
+  #     MODIFIED_FILES_PATH: $(Pipeline.Workspace)/modified_files.bin
+  #     REPOURL: $(Build.Repository.Uri)
+  #   displayName: Discovery
 
-  - powershell: |
-       node dist/index.js --action="discoverTests" --isFullScan=true --path="$Env:BUILD_SOURCESDIRECTORY" --octaneUrl="$(octaneUrl)" --sharedSpace="$(sharedSpaceId)" --workspace="$env:WORKSPACE" --clientSecret="$(octaneClientSecret)" --clientId="$(octaneClientId)" --logLevel=1
-      #node dist/index.js --action="discoverTests" --isFullScan=false --path="C:\dev\azure-devops-integration\agent\_work\8\s\escape" --octaneUrl="$(octaneUrl)" --sharedSpace="$(sharedSpaceId)" --workspace="$env:WORKSPACE" --clientSecret="$(octaneClientSecret)" --clientId="$(octaneClientId)" --logLevel=1
-    env:
-      MODIFIED_FILES_PATH: $(Pipeline.Workspace)/modified_files.bin
-      REPOURL: $(Build.Repository.Uri)
-    displayName: Discovery
+  # - powershell: |
+  #     echo $(Build.SourceVersion) > last_successful_commit.txt
+  #   displayName: "Store current commit SHA"
 
-  - powershell: |
-      echo $(Build.SourceVersion) > last_successful_commit.txt
-    displayName: "Store current commit SHA"
-
-  - publish: last_successful_commit.txt
-    artifact: last-successful
-    displayName: "Publish last successful commit SHA"
+  # - publish: last_successful_commit.txt
+  #   artifact: last-successful
+  #   displayName: "Publish last successful commit SHA"
 
   # - powershell: |
   #     Write-Host "Current Directory:"
