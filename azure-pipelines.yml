@@ -14,6 +14,7 @@ steps:
       OctaneServiceConnection: 'AzureDevOpsExtensionPipelineServiceConnection'
       WorkspaceList: '5007'
       Framework: 'uft'
+      GitRepositoryURL: 'https://github.com/vivienknecht/UftTestsWithDataTables'
 
   # - checkout: self
   #   fetchDepth: 0
