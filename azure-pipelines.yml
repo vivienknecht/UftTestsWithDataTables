@@ -11,10 +11,9 @@ pool: Default
 steps:
   - task: octane-test-runner-start-task-private@1
     inputs:
-      OctaneServiceConnection: "A"
-      WorkspaceList: "5007"
-      Framework: "uft"
-      GitRepositoryURL: "https://github.com/vivienknecht/UftTestsWithDataTables"
+      OctaneServiceConnection: 'AzureDevOpsExtensionPipelineServiceConnection'
+      WorkspaceList: '5007'
+      Framework: 'uft'
 
   # - checkout: self
   #   fetchDepth: 0
