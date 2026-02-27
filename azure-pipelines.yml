@@ -12,7 +12,7 @@ steps:
   - task: octane-test-runner-start-task-private@1
     inputs:
       OctaneServiceConnection: 'AzureDevOpsExtensionPipelineServiceConnection'
-      WorkspaceList: '6002'
+      WorkspaceList: '6003'
       Framework: 'uft'
       GitRepositoryURL: 'https://github.com/vivienknecht/UftTestsWithDataTables'
 
