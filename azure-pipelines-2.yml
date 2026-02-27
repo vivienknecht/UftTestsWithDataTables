@@ -19,11 +19,11 @@ steps:
       versionSpec: "22.x"
     displayName: "Use Node.js"
 
-  - task: octane-start-task-private@1
-    inputs:
-      OctaneServiceConnection: 'octaneConnectionForDiscovery'
-      WorkspaceList: '5006'
-      CreatePipelineCheckbox: true
+  # - task: octane-start-task-private@1
+  #   inputs:
+  #     OctaneServiceConnection: 'octaneConnectionForDiscovery'
+  #     WorkspaceList: '5006'
+  #     CreatePipelineCheckbox: true
 
   - task: octane-test-runner-start-task-private@1
     inputs:
@@ -36,73 +36,73 @@ steps:
   #     node dist/index.js --action="convertTests" --framework="uft" --testsToRun=${env:TESTSTORUN} --logLevel=1
   #   displayName: TestConversion
 
-  # - checkout: self
-  #   fetchDepth: 0
+  - checkout: self
+    fetchDepth: 0
 
-  # - task: DownloadPipelineArtifact@2
-  #   displayName: "Download last successful commit SHA"
+  - task: DownloadPipelineArtifact@2
+    displayName: "Download last successful commit SHA"
+    inputs:
+      buildType: "specific"
+      project: "$(System.TeamProjectId)"
+      definition: "$(System.DefinitionId)"
+      buildVersionToDownload: "latestFromBranch"
+      branchName: "$(Build.SourceBranch)"
+      artifactName: "last-successful"
+      downloadPath: "$(Pipeline.Workspace)\\last-successful"
+    continueOnError: true
+
+  - powershell: |
+      ./eng/detect-changed-files.ps1
+    displayName: Detect changed files since last successful run
+
+  # - powershell: |
+  #     $artifactPath = "$(Pipeline.Workspace)/last-successful/last_successful_commit.txt"
+
+  #     if (Test-Path $artifactPath) {
+  #       $last = Get-Content $artifactPath
+  #       Write-Host "Found last successful commit: $last"
+  #     }
+  #     #Necessary for first run or when no artifacts can be found
+  #     else {
+  #       $last = "$(Build.SourceVersion)^"
+  #       Write-Host "No previous successful run found. Using fallback commit: $last"
+  #     }
+  #     Write-Host "##vso[task.setvariable variable=LAST_SUCCESSFUL_COMMIT]$last"
+  #   displayName: "Resolve last successful commit"
+
+  # - task: PowerShell@2
+  #   name: GetFiles
   #   inputs:
-  #     buildType: "specific"
-  #     project: "$(System.TeamProjectId)"
-  #     definition: "$(System.DefinitionId)"
-  #     buildVersionToDownload: "latestFromBranch"
-  #     branchName: "$(Build.SourceBranch)"
-  #     artifactName: "last-successful"
-  #     downloadPath: "$(Pipeline.Workspace)\\last-successful"
-  #   continueOnError: true
+  #     targetType: inline
+  #     script: |
+  #       git fetch --all
+  #       Write-Host "Diff from $Env:LAST_SUCCESSFUL_COMMIT to HEAD"
+  #       $files = git diff --name-status -M -z $Env:LAST_SUCCESSFUL_COMMIT HEAD | Out-String
+  #       if (-not $files) { $files = "" }
+  #       $encoded = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($files))
+  #       Write-Host "Modified files: $files"
+  #       Write-Host "##vso[task.setvariable variable=MODIFIED_FILES]$encoded"
+  #   displayName: "Get changed files since last successful run"
 
-  # - powershell: |
-  #     ./eng/detect-changed-files.ps1
-  #   displayName: Detect changed files since last successful run
+  - task: octane-get-params-task@1
+    inputs:
+      OctaneServiceConnection: "octaneConnectionForDiscovery"
 
-  # # - powershell: |
-  # #     $artifactPath = "$(Pipeline.Workspace)/last-successful/last_successful_commit.txt"
+  - powershell: |
+       node dist/index.js --action="discoverTests" --isFullScan=true --path="$Env:BUILD_SOURCESDIRECTORY" --octaneUrl="$(octaneUrl)" --sharedSpace="$(sharedSpaceId)" --workspace="$env:WORKSPACE" --clientSecret="$(octaneClientSecret)" --clientId="$(octaneClientId)" --logLevel=1
+      #node dist/index.js --action="discoverTests" --isFullScan=false --path="C:\dev\azure-devops-integration\agent\_work\8\s\escape" --octaneUrl="$(octaneUrl)" --sharedSpace="$(sharedSpaceId)" --workspace="$env:WORKSPACE" --clientSecret="$(octaneClientSecret)" --clientId="$(octaneClientId)" --logLevel=1
+    env:
+      MODIFIED_FILES_PATH: $(Pipeline.Workspace)/modified_files.bin
+      REPOURL: $(Build.Repository.Uri)
+    displayName: Discovery
 
-  # #     if (Test-Path $artifactPath) {
-  # #       $last = Get-Content $artifactPath
-  # #       Write-Host "Found last successful commit: $last"
-  # #     }
-  # #     #Necessary for first run or when no artifacts can be found
-  # #     else {
-  # #       $last = "$(Build.SourceVersion)^"
-  # #       Write-Host "No previous successful run found. Using fallback commit: $last"
-  # #     }
-  # #     Write-Host "##vso[task.setvariable variable=LAST_SUCCESSFUL_COMMIT]$last"
-  # #   displayName: "Resolve last successful commit"
+  - powershell: |
+      echo $(Build.SourceVersion) > last_successful_commit.txt
+    displayName: "Store current commit SHA"
 
-  # # - task: PowerShell@2
-  # #   name: GetFiles
-  # #   inputs:
-  # #     targetType: inline
-  # #     script: |
-  # #       git fetch --all
-  # #       Write-Host "Diff from $Env:LAST_SUCCESSFUL_COMMIT to HEAD"
-  # #       $files = git diff --name-status -M -z $Env:LAST_SUCCESSFUL_COMMIT HEAD | Out-String
-  # #       if (-not $files) { $files = "" }
-  # #       $encoded = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($files))
-  # #       Write-Host "Modified files: $files"
-  # #       Write-Host "##vso[task.setvariable variable=MODIFIED_FILES]$encoded"
-  # #   displayName: "Get changed files since last successful run"
-
-  # - task: octane-get-params-task@1
-  #   inputs:
-  #     OctaneServiceConnection: "octaneConnectionForDiscovery"
-
-  # - powershell: |
-  #      node dist/index.js --action="discoverTests" --isFullScan=false --path="$Env:BUILD_SOURCESDIRECTORY" --octaneUrl="$(octaneUrl)" --sharedSpace="$(sharedSpaceId)" --workspace="$env:WORKSPACE" --clientSecret="$(octaneClientSecret)" --clientId="$(octaneClientId)" --logLevel=1
-  #     #node dist/index.js --action="discoverTests" --isFullScan=false --path="C:\dev\azure-devops-integration\agent\_work\8\s\escape" --octaneUrl="$(octaneUrl)" --sharedSpace="$(sharedSpaceId)" --workspace="$env:WORKSPACE" --clientSecret="$(octaneClientSecret)" --clientId="$(octaneClientId)" --logLevel=1
-  #   env:
-  #     MODIFIED_FILES_PATH: $(Pipeline.Workspace)/modified_files.bin
-  #     REPOURL: $(Build.Repository.Uri)
-  #   displayName: Discovery
-
-  # - powershell: |
-  #     echo $(Build.SourceVersion) > last_successful_commit.txt
-  #   displayName: "Store current commit SHA"
-
-  # - publish: last_successful_commit.txt
-  #   artifact: last-successful
-  #   displayName: "Publish last successful commit SHA"
+  - publish: last_successful_commit.txt
+    artifact: last-successful
+    displayName: "Publish last successful commit SHA"
 
   - powershell: |
       Write-Host "Current Directory:"
