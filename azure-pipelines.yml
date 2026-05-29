@@ -9,12 +9,11 @@ trigger:
 pool: Default
 
 steps:
-  - task: octane-test-runner-start-task-private@1
-    inputs:
-      OctaneServiceConnection: 'AzureDevOpsExtensionPipelineServiceConnection'
-      WorkspaceList: '6003'
-      Framework: 'uft'
-      GitRepositoryURL: 'https://github.com/vivienknecht/UftTestsWithDataTables'
+ - task: octane-test-runner-start-task-private@1
+   inputs:
+     OctaneServiceConnection: 'azurePConnection'
+     WorkspaceList: '4001'
+     Framework: 'uft'
 
   # - checkout: self
   #   fetchDepth: 0
