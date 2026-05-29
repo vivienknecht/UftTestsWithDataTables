@@ -17,13 +17,13 @@ steps:
  - task: octane-start-task-private@1
    inputs:
      OctaneServiceConnection: 'azurePConnection'
-     WorkspaceList: '5002'
+     WorkspaceList: '5003'
      CreatePipelineCheckbox: true
 
  - task: octane-test-runner-start-task-private@1
    inputs:
      OctaneServiceConnection: 'azurePConnection'
-     WorkspaceList: '5002'
+     WorkspaceList: '5003'
      Framework: 'uft'
      GitRepositoryURL: 'https://github.com/vivienknecht/UftTestsWithDataTables'
 
@@ -138,7 +138,7 @@ steps:
  - task: octane-end-task-private@1
    inputs:
       OctaneServiceConnection: "azurePConnection"
-      WorkspaceList: "5002"
+      WorkspaceList: "5003"
       Framework: "uft"
    env:
       UNIT_TEST_RESULTS_GLOB_PATTERN: ${{ parameters.unitTestResultsGlobPattern }}
