@@ -22,13 +22,13 @@ steps:
   # - task: octane-start-task-private@1
   #   inputs:
   #     OctaneServiceConnection: 'octaneConnectionForDiscovery'
-  #     WorkspaceList: '6001'
+  #     WorkspaceList: '5006'
   #     CreatePipelineCheckbox: true
 
   - task: octane-test-runner-start-task-private@1
     inputs:
       OctaneServiceConnection: "octaneConnectionForDiscovery"
-      WorkspaceList: "8003"
+      WorkspaceList: "6001"
       Framework: "uft"
       GitRepositoryURL: "https://github.com/vivienknecht/UftTestsWithDataTables"
 
@@ -39,17 +39,17 @@ steps:
   - checkout: self
     fetchDepth: 0
 
-  - task: DownloadPipelineArtifact@2
-    displayName: "Download last successful commit SHA"
-    inputs:
-      buildType: "specific"
-      project: "$(System.TeamProjectId)"
-      definition: "$(System.DefinitionId)"
-      buildVersionToDownload: "latestFromBranch"
-      branchName: "$(Build.SourceBranch)"
-      artifactName: "last-successful"
-      downloadPath: "$(Pipeline.Workspace)\\last-successful"
-    continueOnError: true
+  # - task: DownloadPipelineArtifact@2
+  #   displayName: "Download last successful commit SHA"
+  #   inputs:
+  #     buildType: "specific"
+  #     project: "$(System.TeamProjectId)"
+  #     definition: "$(System.DefinitionId)"
+  #     buildVersionToDownload: "latestFromBranch"
+  #     branchName: "$(Build.SourceBranch)"
+  #     artifactName: "last-successful"
+  #     downloadPath: "$(Pipeline.Workspace)\\last-successful"
+  #   continueOnError: true
 
   - powershell: |
       ./eng/detect-changed-files.ps1
@@ -89,7 +89,7 @@ steps:
       OctaneServiceConnection: "octaneConnectionForDiscovery"
 
   - powershell: |
-       node dist/index.js --action="discoverTests" --isFullScan=false --path="$Env:BUILD_SOURCESDIRECTORY" --octaneUrl="$(octaneUrl)" --sharedSpace="$(sharedSpaceId)" --workspace="$env:WORKSPACE" --clientSecret="$(octaneClientSecret)" --clientId="$(octaneClientId)" --logLevel=1
+       node dist/cli/index.js --action="discoverTests" --isFullScan=true --path="$Env:BUILD_SOURCESDIRECTORY" --octaneUrl="$(octaneUrl)" --sharedSpace="$(sharedSpaceId)" --workspace="$env:WORKSPACE" --clientSecret="$(octaneClientSecret)" --clientId="$(octaneClientId)" --logLevel=1
       #node dist/index.js --action="discoverTests" --isFullScan=false --path="C:\dev\azure-devops-integration\agent\_work\8\s\escape" --octaneUrl="$(octaneUrl)" --sharedSpace="$(sharedSpaceId)" --workspace="$env:WORKSPACE" --clientSecret="$(octaneClientSecret)" --clientId="$(octaneClientId)" --logLevel=1
     env:
       MODIFIED_FILES_PATH: $(Pipeline.Workspace)/modified_files.bin
@@ -110,14 +110,11 @@ steps:
       echo "Building..."
       mkdir build
       $ESCAPED_DIR = $Env:BUILD_SOURCESDIRECTORY.Replace('\', '\\')
-      $content = @"
-      $testsToRunConverted
-      "@
       Set-Content -Path "./build/testsToRun.mtbx" -Value $env:testsToRunConverted
       Set-Content -Path ./build/Props.txt -Value "runType=FileSystem"
       Add-Content -Path ./build/Props.txt -Value "resultsFilename=build\\Results.xml"
-      Add-Content -Path ./build/Props.txt -Value "Test1=$ESCAPED_DIR\\build\\testsToRun.mtbx"
-      #Add-Content -Path ./build/Props.txt -Value "Test1=$ESCAPED_DIR\\browsers\\TestWDataTableRenamed"
+      #Add-Content -Path ./build/Props.txt -Value "Test1=$ESCAPED_DIR\\build\\testsToRun.mtbx"
+      Add-Content -Path ./build/Props.txt -Value "Test1=$ESCAPED_DIR\\GUITest2R"
       Add-Content -Path ./build/Props.txt -Value "resultUnifiedTestClassname=true"
       Add-Content -Path ./build/Props.txt -Value "resultTestNameOnly=true"
       Get-Content -Path ./build/Props.txt
@@ -134,7 +131,7 @@ steps:
   - task: octane-end-task-private@1
     inputs:
       OctaneServiceConnection: "octaneConnectionForDiscovery"
-      WorkspaceList: "8003"
+      WorkspaceList: "6001"
       Framework: "uft"
     env:
       UNIT_TEST_RESULTS_GLOB_PATTERN: ${{ parameters.unitTestResultsGlobPattern }}
